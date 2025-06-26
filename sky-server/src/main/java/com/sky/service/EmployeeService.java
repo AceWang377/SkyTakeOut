@@ -31,4 +31,15 @@ public interface EmployeeService {
     启用禁用员工账号
      */
     void activeOrDeactive(Integer status, Long id);
+
+    /*
+    get employee by id
+     */
+    Employee getEmployeeById(Long id);
+
+    /**
+     * 编辑员工信息
+     * @param employeeDTO
+     */
+    void update(EmployeeDTO employeeDTO);
 }

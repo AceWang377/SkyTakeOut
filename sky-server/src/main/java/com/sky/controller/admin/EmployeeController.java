@@ -113,4 +113,28 @@ public class EmployeeController {
         return Result.success();
     }
 
+    /*
+    Get employee by id
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("Get Employee By Id")
+    public Result<Employee> getById(@PathVariable Long id){
+        log.info("Get Employee By Id: {}",  id);
+        Employee employee = employeeService.getEmployeeById(id);
+        return Result.success(employee);
+    }
+
+    /*
+    Update employee information
+    查询操作指定范性，指定范性类型
+    接受json data，需要@RequestBody
+     */
+    @PutMapping
+    @ApiOperation("Update employee information")
+    public Result update(@RequestBody EmployeeDTO employeeDTO){
+        log.info("Update employee information: {}", employeeDTO);
+        employeeService.update(employeeDTO);
+        return Result.success();
+    }
+
 }
