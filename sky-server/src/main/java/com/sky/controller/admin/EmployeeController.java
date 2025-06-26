@@ -91,12 +91,26 @@ public class EmployeeController {
 
     }
 
+    /*
+    Query page
+     */
     @GetMapping("/page")
     @ApiOperation("Query page")
     public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
         log.info("Query page: {}", employeePageQueryDTO);
         PageResult pageResult = employeeService.queryPage(employeePageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    /*
+    Active or deactive employee status
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("Active or deactive employee status")
+    public Result activeOrDeactive(@PathVariable Integer status, Long id) {
+        log.info("Active or deactive employee status: {}, employee id: {}", status, id);
+        employeeService.activeOrDeactive(status, id);
+        return Result.success();
     }
 
 }
