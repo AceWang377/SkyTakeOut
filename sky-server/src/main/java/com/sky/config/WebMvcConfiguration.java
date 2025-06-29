@@ -30,6 +30,8 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     @Autowired
     private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
 
+    private final String uploadPath = "/Users/wangzixuandemacbook/Desktop/FoodDeliveraryApp/DataBase/DishStorage";
+
     /**
      * 注册自定义拦截器
      *
@@ -69,6 +71,11 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+
+
+        // Serve uploaded images
+        registry.addResourceHandler("/images/**")
+                .addResourceLocations("file:" + uploadPath + "/");
     }
 
     protected void extendMessageConverters(List<HttpMessageConverter<?>> converters){
@@ -81,5 +88,6 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         //将上面的消息转换器对象追加到mvc框架的转换器集合中
         converters.add(0,messageConverter);
     }
+
 
 }
