@@ -2,10 +2,13 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetMealDishMapper;
 import com.sky.mapper.SetmealMapper;
@@ -58,5 +61,21 @@ public class SetMealServiceImpl implements SetMealService {
         PageHelper.startPage(pageNum, pageSize);
         Page<SetmealVO> page = setMealMapper.pageQuery(setmealPageQueryDTO);
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    @Override
+    public void deleteBatch(List<Long> ids) {
+        ids.forEach(id -> {
+            Setmeal setmeal = setMealMapper.getById(id);
+            if (setmeal.getStatus() == StatusConstant.ENABLE) {
+                throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+
+            }
+        });
+
+        ids.forEach(id -> {
+            setMealMapper.deleteById(id);
+            setMealDishMapper.deleteBySetmealId(id);
+        });
     }
 }
