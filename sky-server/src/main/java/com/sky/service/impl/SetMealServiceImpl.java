@@ -15,7 +15,6 @@ import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetMealService;
 import com.sky.vo.SetmealVO;
-import net.bytebuddy.implementation.auxiliary.AuxiliaryType;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +33,7 @@ public class SetMealServiceImpl implements SetMealService {
 
     @Autowired
     private DishMapper dishMapper;
+
 
     @Override
     @Transactional
@@ -77,5 +77,34 @@ public class SetMealServiceImpl implements SetMealService {
             setMealMapper.deleteById(id);
             setMealDishMapper.deleteBySetmealId(id);
         });
+    }
+
+    @Override
+    public SetmealVO queryById(Long id) {
+        Setmeal setmeal = setMealMapper.getById(id);
+        List<SetmealDish> setmealDishes = setMealDishMapper.getSetMealIds(id);
+
+        SetmealVO setmealVO = new SetmealVO();
+        BeanUtils.copyProperties(setmeal, setmealVO);
+        setmealVO.setSetmealDishes(setmealDishes);
+
+        return setmealVO;
+
+    }
+
+    @Override
+    @Transactional
+    public void update(SetmealDTO setmealDTO) {
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+
+        setMealMapper.update(setmeal);
+
+        Long setmealId = setmealDTO.getId();
+        setMealDishMapper.deleteBySetmealId(setmealId);
+
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        setmealDishes.forEach(setmealDish -> setmealDish.setSetmealId(setmealId));
+        setMealDishMapper.insertBatch(setmealDishes);
     }
 }
