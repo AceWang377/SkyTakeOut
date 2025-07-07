@@ -103,6 +103,14 @@ public class DishController {
         return Result.success(list);
     }
 
+    @PostMapping("/status/{status}")
+    @ApiOperation("start or stop dish")
+    public Result startOrStop(@PathVariable("status") Integer status, Long id) {
+        log.info("start or stop dish: {}", id);
+        dishService.startOrStop(status, id);
+        return Result.success();
+    }
+
     private void cleanCache(String pattern) {
         log.info("clean cache: {}", pattern);
         Set<String> keys = redisTemplate.keys(pattern );
