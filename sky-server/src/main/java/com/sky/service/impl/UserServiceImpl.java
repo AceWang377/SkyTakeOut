@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
         String openid = getOpenid(userLoginDTO.getCode());
 
-        if (openid != null) {
+        if (openid == null) {
             throw new LoginFailedException(MessageConstant.LOGIN_FAILED);
         }
 
