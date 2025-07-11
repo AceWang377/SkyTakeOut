@@ -31,4 +31,9 @@ public interface OrderService {
      OrderVO details(Long id);
 
      void cancel(Long id) throws Exception;
+
+     /*
+      * Repetition order
+      */
+     void repetition(Long id);
 }

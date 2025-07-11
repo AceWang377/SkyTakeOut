@@ -88,4 +88,12 @@ public class OrderController {
         return Result.success();
     }
 
+    @PostMapping("/repetition/{id}")
+    @ApiOperation("Repetition Order By ID")
+    public Result repetition(@PathVariable(value = "id") Long id) throws Exception {
+        log.info("重复下单：{}", id);
+        orderService.repetition(id);
+        return Result.success();
+    }
+
 }
