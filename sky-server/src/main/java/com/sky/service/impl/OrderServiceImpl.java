@@ -199,6 +199,38 @@ public class OrderServiceImpl implements OrderService {
         return orderVO;
     }
 
+    @Override
+    public void cancel(Long id) throws Exception {
+        // query by ID
+        Orders ordersDB = orderMapper.getByOrderId(id);
+        // check if order exists
+        if (ordersDB == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        // check order status
+        if (ordersDB.getStatus() > 2) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Orders orders = new Orders();
+        orders.setId(ordersDB.getId());
+
+        // cancel order if order status is 1 or 2
+        if (ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+//            // wechat refund
+//            weChatPayUtil.refund(ordersDB.getNumber(),
+//                    ordersDB.getNumber(),
+//                    new BigDecimal(0.01),
+//                    new BigDecimal(0.01));
+            orders.setStatus(Orders.REFUND);
+            }
+
+        orders.setCancelReason("用户取消");
+        orders.setCancelTime(LocalDateTime.now());
+        orders.setStatus(Orders.CANCELLED);
+        orderMapper.update(orders);
+    }
 
 
 }

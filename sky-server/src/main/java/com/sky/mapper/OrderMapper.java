@@ -32,4 +32,7 @@ public interface OrderMapper {
 
     @Select("select * from orders where id = #{id}")
     Orders getByOrderId(Long id);
+
+
+    void cancel(Long id);
 }

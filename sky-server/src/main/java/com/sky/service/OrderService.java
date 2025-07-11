@@ -29,4 +29,6 @@ public interface OrderService {
 
 
      OrderVO details(Long id);
+
+     void cancel(Long id) throws Exception;
 }
