@@ -56,4 +56,10 @@ public interface OrderService {
       * @param id
       */
      void delivery(Long id);
+
+     /**
+      * Complete order
+      * @param id
+      */
+     void complete(Long id);
 }

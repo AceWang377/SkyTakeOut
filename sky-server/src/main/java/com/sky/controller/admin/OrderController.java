@@ -91,6 +91,17 @@ public class OrderController {
         return Result.success();
     }
 
+    /**
+     * complete order
+     */
+    @PutMapping("/complete/{id}")
+    @ApiOperation("complete order")
+    public Result complete(@PathVariable(value = "id") Long id) {
+        log.info("complete order：complete");
+        orderService.complete(id);
+        return Result.success();
+    }
+
 
 
 

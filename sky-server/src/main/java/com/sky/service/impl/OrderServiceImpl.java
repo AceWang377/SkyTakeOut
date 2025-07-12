@@ -397,5 +397,21 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(ordersDB);
     }
 
+    @Override
+    public void complete(Long id) {
+        // query order
+        Orders orders = orderMapper.getByOrderId(id);
+        if (orders == null || !orders.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        // complete order
+        Orders orders1 = new Orders();
+        orders1.setId(orders.getId());
+        orders1.setStatus(Orders.COMPLETED);
+        orders1.setDeliveryTime(LocalDateTime.now());
+        orderMapper.update(orders1);
+    }
+
 
 }
