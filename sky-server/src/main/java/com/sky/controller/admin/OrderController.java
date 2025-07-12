@@ -1,7 +1,9 @@
 package com.sky.controller.admin;
 
+import com.sky.dto.OrdersCancelDTO;
 import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
+import com.sky.dto.OrdersRejectionDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
@@ -53,6 +55,22 @@ public class OrderController {
     public Result confirm(@RequestBody OrdersConfirmDTO orderConfirmDTO) {
         log.info("确认订单：confirm");
         orderService.confirm(orderConfirmDTO);
+        return Result.success();
+    }
+
+    @PutMapping("/rejection")
+    @ApiOperation("Reject order")
+    public Result rejection(@RequestBody OrdersRejectionDTO ordersRejectionDTO) throws Exception {
+        log.info("Reject order：rejection");
+        orderService.rejection(ordersRejectionDTO);
+        return Result.success();
+    }
+
+    @PutMapping("/cancel")
+    @ApiOperation("Cancel order")
+    public Result cancel(@RequestBody OrdersCancelDTO ordersCancelDTO) throws Exception {
+        log.info("Cancel order：cancel");
+        orderService.cancelOrders(ordersCancelDTO);
         return Result.success();
     }
 
