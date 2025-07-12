@@ -1,5 +1,6 @@
 package com.sky.service;
 
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.Orders;
@@ -36,4 +37,6 @@ public interface OrderService {
       * Repetition order
       */
      void repetition(Long id);
+
+     PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO);
 }
