@@ -11,8 +11,15 @@ sky:
     secret: 34bacae51baef43e98ef1dde650d7b1c
 
 
+
   redis:
     host: localhost
     port: 6379
     password: aqj710310
     database: 10
+
+  shop:
+    address: 北京市海淀区上地10街10号
+  baidu:
+    ak: aLHwtPJ9WBHdV8YWfBtMgpr7HWsWhLrC
+
