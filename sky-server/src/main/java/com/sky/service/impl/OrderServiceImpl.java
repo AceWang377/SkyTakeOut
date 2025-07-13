@@ -22,6 +22,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +52,8 @@ public class OrderServiceImpl implements OrderService {
     private WeChatPayUtil weChatPayUtil;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @Value("${sky.baidu.ak}")
     private String ak;
@@ -232,7 +235,17 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        // websocket send message
+        Map map = new HashMap();
+        map.put("type", 1); // 1 == new order  2 == rush order
+        map.put("orderId", ordersDB.getId());
+        map.put("content", "新订单：" + outTradeNo);
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
+
     }
+
+
 
     @Override
     public PageResult pageQuery(int page, int pageSize, Integer status) {
