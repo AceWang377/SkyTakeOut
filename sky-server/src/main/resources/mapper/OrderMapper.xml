@@ -73,5 +73,20 @@
         order by order_time desc
     </select>
 
+    <select id="sumByMap" resultType="java.lang.Double">
+        select sum(orders.amount) turnover_amount from orders
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="beginTime != null">
+                and order_time &gt;= #{begin}
+            </if>
+            <if test="endTime != null">
+                and order_time &lt;= #{end}
+            </if>
+        </where>
+    </select>
+
 
 </mapper>
