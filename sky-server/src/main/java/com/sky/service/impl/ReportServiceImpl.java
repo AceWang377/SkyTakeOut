@@ -2,8 +2,10 @@ package com.sky.service.impl;
 
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
+import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.TurnoverReportVO;
+import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.StringUtil;
@@ -24,6 +26,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * turnover report
@@ -61,6 +65,46 @@ public class ReportServiceImpl implements ReportService {
         return TurnoverReportVO.builder()
                 .dateList(org.apache.commons.lang3.StringUtils.join(dateList, ","))
                 .turnoverList(StringUtils.join(turnoverList, ","))
+                .build();
+    }
+
+    @Override
+    public UserReportVO getUserReport(LocalDate begin, LocalDate end) {
+        // DateList
+        List<LocalDate> dateList = new ArrayList<>();
+        dateList.add(begin);
+        while (!begin.equals(end)) {
+            begin = begin.plusDays(1);
+            dateList.add(begin);
+        }
+        // UserList
+        List<Integer> userList = new ArrayList<>();
+        List<Integer> totalUserList = new ArrayList<>();
+
+        for (LocalDate date : dateList) {
+            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
+
+            Map map = new HashMap();
+            map.put("end", endTime);
+
+            // count all user by date
+            Integer totalUser = userMapper.countByMap(map);
+
+            map.put("begin", beginTime);
+
+            Integer newUser = userMapper.countByMap(map);
+
+            userList.add(newUser);
+            totalUserList.add(totalUser);
+        }
+
+
+        return UserReportVO
+                .builder()
+                .dateList(org.apache.commons.lang3.StringUtils.join(dateList, ","))
+                .totalUserList(org.apache.commons.lang3.StringUtils.join(totalUserList, ","))
+                .newUserList(org.apache.commons.lang3.StringUtils.join(userList, ","))
                 .build();
     }
 }

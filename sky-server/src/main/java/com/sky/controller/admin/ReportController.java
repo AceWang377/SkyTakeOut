@@ -3,6 +3,7 @@ package com.sky.controller.admin;
 import com.sky.result.Result;
 import com.sky.service.ReportService;
 import com.sky.vo.TurnoverReportVO;
+import com.sky.vo.UserReportVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -39,5 +40,21 @@ public class ReportController {
         TurnoverReportVO turnoverReport = reportService.getTurnoverReport(begin, end);
         return Result.success(turnoverReport);
     }
+
+    /**
+     * user statistics
+     */
+    @GetMapping("/userStatistics")
+    @ApiOperation(value = "User Statistics")
+    public Result<UserReportVO> userStatistics(
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end
+    ) {
+        log.info("user statistics: {}, {}", begin, end);
+        UserReportVO userReport = reportService.getUserReport(begin, end);
+        return Result.success(userReport);
+
+    }
+
 
 }
