@@ -96,4 +96,15 @@ public class OrderController {
         return Result.success();
     }
 
+    /**
+     * rush order
+     */
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("Rush Order By ID")
+    public Result reminder(@PathVariable(value = "id") Long id) throws Exception {
+        log.info("催单：{}", id);
+        orderService.reminder(id);
+        return Result.success();
+    }
+
 }

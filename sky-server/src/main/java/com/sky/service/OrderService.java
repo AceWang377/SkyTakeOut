@@ -62,4 +62,9 @@ public interface OrderService {
       * @param id
       */
      void complete(Long id);
+
+     /*
+      * Reminder
+      */
+     void reminder(Long id);
 }

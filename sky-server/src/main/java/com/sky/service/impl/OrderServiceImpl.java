@@ -504,5 +504,21 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(orders1);
     }
 
+    @Override
+    public void reminder(Long id) {
+        // query order
+        Orders orders = orderMapper.getByOrderId(id);
+        if (orders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        Map map = new HashMap();
+        map.put("type", 2); // reminder the order
+        map.put("orderId", id);
+        map.put("content", "订单号：" + orders.getNumber() + "，请及时处理");
+
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
+    }
+
 
 }
