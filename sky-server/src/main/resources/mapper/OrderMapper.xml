@@ -105,4 +105,17 @@
     </select>
 
 
+    <select id="getSalesTop" resultType="com.sky.dto.GoodsSalesDTO">
+        select od.name, sum(od.number) number from orders o, order_detail od
+        where o.id = od.order_id and o.status = 5
+        and o.order_time between
+            <if test="begin != null">#{begin}</if> and
+            <if test="end != null">#{end}</if>
+        group by od.name
+        order by number desc
+        limit 10
+    </select>
+
+
+
 </mapper>

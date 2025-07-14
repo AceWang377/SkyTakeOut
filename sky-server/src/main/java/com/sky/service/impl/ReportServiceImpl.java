@@ -1,10 +1,12 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -153,6 +156,26 @@ public class ReportServiceImpl implements ReportService {
                 .totalOrderCount(totalCount)
                 .build();
     }
+
+    @Override
+    public SalesTop10ReportVO getSalesTop10Report(LocalDate begin, LocalDate end) {
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+        List<GoodsSalesDTO> goodsSalesDTOList = orderMapper.getSalesTop(beginTime, endTime, 5);
+
+        List<String> names = goodsSalesDTOList.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
+        String nameLists = StringUtils.join(names, ",");
+
+        List<Integer> numbers = goodsSalesDTOList.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+        String numberLists = StringUtils.join(numbers, ",");
+        return SalesTop10ReportVO.builder()
+                .nameList(nameLists)
+                .numberList(numberLists)
+                .build();
+    }
+
+
+
 
     private Integer getOrderCount(LocalDateTime begin, LocalDateTime end, Integer status) {
         Map map = new HashMap();
