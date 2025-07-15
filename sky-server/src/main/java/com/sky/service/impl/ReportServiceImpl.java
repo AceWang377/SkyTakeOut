@@ -5,16 +5,20 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.service.WorkspaceService;
+import com.sky.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.StringUtil;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -32,6 +36,8 @@ public class ReportServiceImpl implements ReportService {
     private OrderMapper orderMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private WorkspaceService workspaceService;
 
     /**
      * turnover report
@@ -174,7 +180,68 @@ public class ReportServiceImpl implements ReportService {
                 .build();
     }
 
+    /**
+     * export business data to excel
+     * @param response
+     */
+    @Override
+    public void exportBusiness(HttpServletResponse response) {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=BusinessReport.xlsx");
 
+        // query database
+        LocalDate beginDay = LocalDate.now().minusDays(30);
+        LocalDate endDay = LocalDate.now().minusDays(1);
+
+        BusinessDataVO businessDataVO = workspaceService.getBusinessData(LocalDateTime.of(beginDay, LocalTime.MIN), LocalDateTime.of(endDay, LocalTime.MAX));
+
+        // write to excel via POI
+        InputStream inputSteam = this.getClass().getClassLoader().getResourceAsStream("template/DataReportTemplate.xlsx");
+        try {
+            // create excel based on the input stream
+            XSSFWorkbook excel = new XSSFWorkbook(inputSteam);
+            // fill up the cells
+            XSSFSheet sheet1 = excel.getSheet("Sheet1");
+            sheet1.getRow(1).getCell(1).setCellValue("Date From: " + beginDay + " To: " + endDay);
+
+            // turnover
+            sheet1.getRow(3).getCell(2).setCellValue(businessDataVO.getTurnover());
+            // valid order count
+            sheet1.getRow(4).getCell(2).setCellValue(businessDataVO.getValidOrderCount());
+            // user order complete rate
+            sheet1.getRow(3).getCell(4).setCellValue(businessDataVO.getOrderCompletionRate());
+            // new user count
+            sheet1.getRow(3).getCell(6).setCellValue(businessDataVO.getNewUsers());
+            // average unit price
+            sheet1.getRow(4).getCell(4).setCellValue(businessDataVO.getUnitPrice());
+
+            // fill up details date
+            for (int i = 0; i < 30; i ++) {
+                LocalDate date = beginDay.plusDays(i);
+                // query daily business data
+                BusinessDataVO businessDataVO1 = workspaceService.getBusinessData(LocalDateTime.of(date, LocalTime.MIN), LocalDateTime.of(date, LocalTime.MAX));
+                sheet1.getRow(i + 7).getCell(1).setCellValue(date.toString());
+                sheet1.getRow(i + 7).getCell(2).setCellValue(businessDataVO1.getTurnover());
+                sheet1.getRow(i + 7).getCell(3).setCellValue(businessDataVO1.getValidOrderCount());
+                sheet1.getRow(i + 7).getCell(4).setCellValue(businessDataVO1.getOrderCompletionRate());
+                sheet1.getRow(i + 7).getCell(5).setCellValue(businessDataVO1.getUnitPrice());
+                sheet1.getRow(i + 7).getCell(6).setCellValue(businessDataVO1.getNewUsers());
+            }
+
+
+            // download excel via outputStream
+            ServletOutputStream outputStream = response.getOutputStream();
+            excel.write(outputStream);
+
+            // excel close
+            outputStream.flush();
+            outputStream.close();
+            excel.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
 
     private Integer getOrderCount(LocalDateTime begin, LocalDateTime end, Integer status) {
